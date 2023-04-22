@@ -9,7 +9,19 @@ namespace Price_Calculator_kata
 {
     public class FlatRateTaxCalculator : ITaxCalculator
     {
-        public static double TaxPercentageDefault = 20.0;
+        private static double _TaxPercentageDefault = 20.0;
+        public static double TaxPercentageDefault {
+            get => _TaxPercentageDefault;
+            set
+            {
+                if (value > 0.0 && value < 100.0)
+                {
+                    _TaxPercentageDefault = value;
+                }
+            }
+        }
+
+           
         
         public double CalculateTaxAmount(double Price)
         {

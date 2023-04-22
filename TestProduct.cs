@@ -15,7 +15,7 @@ namespace Price_Calculator_kata
             TaxServices.ApplyTax(Book, FlatRateTax);
             Console.WriteLine(Book.ToString());
             Console.WriteLine($"Taxed Price with default Tax of 20% :{Book.CalculateTotalPrice()}");
-            TaxServices.ChangeFlateRateTax(21.0);
+            FlatRateTaxCalculator.TaxPercentageDefault = 21.0;
             Console.WriteLine($"Taxed Price with Tax of 21% :{Book.CalculateTotalPrice()}");
 
         }

@@ -8,15 +8,7 @@ namespace Price_Calculator_kata
 {
     public class TaxServices
     {
-        public static Boolean ChangeFlateRateTax( double taxRate)
-        {
-            if (taxRate > 0 && taxRate < 100)
-            {
-                FlatRateTaxCalculator.TaxPercentageDefault = taxRate;
-                return true;
-            }
-            else return false;
-        }
+        
         public static ITaxCalculator CreateFlatRateTaxCalculator()
         {
             return new FlatRateTaxCalculator();
