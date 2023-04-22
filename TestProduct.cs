@@ -11,8 +11,6 @@ namespace Price_Calculator_kata
         public static void Main(string[] args)
         {
             Product Book = new Product("The Little Prince", 12345, 20.25);
-            ITaxCalculator FlatRateTax=TaxServices.CreateFlatRateTaxCalculator();
-            TaxServices.ApplyTax(Book, FlatRateTax);
             Console.WriteLine(Book.ToString());
             Console.WriteLine($"Taxed Price with default Tax of 20% :{Book.CalculateTotalPrice()}");
             FlatRateTaxCalculator.TaxPercentageDefault = 21.0;

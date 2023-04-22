@@ -13,6 +13,7 @@ namespace Price_Calculator_kata
             this.Name = Name;
             this.UPC = UPC;
             this.Price = Price;
+            TaxServices.ApplyFlatRateTax(this);
         }
         
         public double Price {

@@ -20,9 +20,21 @@ namespace Price_Calculator_kata
                 }
             }
         }
+        private FlatRateTaxCalculator() { }
+        private static FlatRateTaxCalculator? instance = null;
+        public static FlatRateTaxCalculator Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new FlatRateTaxCalculator();
+                }
+                return instance;
+            }
+        }
 
-           
-        
+
         public double CalculateTaxAmount(double Price)
         {
             double taxAmount = Price * (TaxPercentageDefault / 100.0);
