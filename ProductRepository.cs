@@ -30,12 +30,9 @@ namespace Price_Calculator_kata
             return _products.FirstOrDefault(p => p.UPC == upc);
         }
 
-        public void PrintPriceReport(DiscountService MyDiscountService)
+       public List<Product> GetAll()
         {
-            foreach (Product product in _products)
-            {
-                Console.WriteLine(product.ReportPriceDetails(MyDiscountService));
-            }
+            return _products;
         }
 
 

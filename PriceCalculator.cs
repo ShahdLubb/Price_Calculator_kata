@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 
 namespace Price_Calculator_kata
 {
-    public static class PriceCalculator
+    public class PriceCalculator
     {
-        
-        public static double CalculateTotalPrice(this Product product,DiscountService MyDiscountService)
+        DiscountService MyDiscountService;
+        ProductRepository products;
+        public PriceCalculator(DiscountService discountService, ProductRepository products) {
+            this.MyDiscountService = discountService;
+            this.products= products;
+         }
+
+        public  double CalculateTotalPrice( Product product)
         {
             if (product.TaxCalculator is null) throw new TaxNotAppliedException();
 
@@ -29,7 +35,7 @@ namespace Price_Calculator_kata
             }
             temp = null;
             return Math.Round(product.Price + TaxAmount - BeforTaxDiscountAmount - AfterTaxDiscountAmount, 2);
-        }
+        }  
 
     }
 }

@@ -10,12 +10,7 @@ namespace Price_Calculator_kata
     {
         private  List<IDiscountCalculator> _BeforeTaxDiscounts = new List<IDiscountCalculator>();
         private  List<IDiscountCalculator> _AfterTaxDiscounts = new List<IDiscountCalculator>();
-        private readonly ProductRepository _productRepository;
-
-        public DiscountService(ProductRepository productRepository)
-        {
-            _productRepository = productRepository;
-        }
+  
         public static IDiscountCalculator CreateRelativeDiscount(double discountPercentage)
         {
             return new RelativeDiscountCalculator(discountPercentage);
@@ -38,7 +33,7 @@ namespace Price_Calculator_kata
         {
            if(Discount.isBeforeTax()) _BeforeTaxDiscounts.Add(Discount);
            else _AfterTaxDiscounts.Add(Discount);
-           _productRepository.PrintPriceReport(this);
+            OnDiscountAdded(new EventArgs());
         }
 
         public List<IDiscountCalculator> GetBeforeTaxDiscounts()
@@ -50,6 +45,12 @@ namespace Price_Calculator_kata
         {
             return _AfterTaxDiscounts;
 
+        }
+
+        public event EventHandler<EventArgs> DiscountAdded;
+        protected virtual void OnDiscountAdded(EventArgs e)
+        {
+            DiscountAdded?.Invoke(this, e);
         }
 
     }

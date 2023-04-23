@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 
 namespace Price_Calculator_kata
 {
-    public static  class ReportGenerator
+    public  class ReportGenerator
     {
-        public static string ReportPriceDetails(this Product product, DiscountService MyDiscountService)
+        DiscountService MyDiscountService;
+        ProductRepository products;
+        public ReportGenerator(DiscountService discountService,ProductRepository products)
+        {
+            this.MyDiscountService = discountService;
+            this.products = products;
+            discountService.DiscountAdded += DiscountAddedEventHandler;
+        }
+        public string ReportPriceDetails(Product product)
         {
             StringBuilder report = new StringBuilder();
             report.AppendLine(product.ToString());
@@ -35,6 +43,18 @@ namespace Price_Calculator_kata
             report.AppendLine($"Price=${TotalPrice}");
             report.AppendLine($"Discount Amount=${Math.Round(AfterTaxDiscountAmount + BeforTaxDiscountAmount, 2)}");
             return report.ToString();
+        }
+        public void ReportPriceDetailsForAllProducts()
+        {
+            foreach(Product product in products.GetAll())
+            {
+                Console.WriteLine(ReportPriceDetails(product));
+            }
+            Console.WriteLine("*******************************");
+        }
+        private void DiscountAddedEventHandler(object sender, EventArgs e)
+        {
+            ReportPriceDetailsForAllProducts();
         }
     }
 }
