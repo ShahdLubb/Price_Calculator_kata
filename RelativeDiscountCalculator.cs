@@ -9,8 +9,8 @@ namespace Price_Calculator_kata
 {
     internal class RelativeDiscountCalculator : IDiscountCalculator
     {
-        private static double _Discount = 0.0;
-        public static double Discount
+        private  double _Discount = 0.0;
+        public  double Discount
         {
             get => _Discount;
             set

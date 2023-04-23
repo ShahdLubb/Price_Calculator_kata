@@ -14,13 +14,17 @@ namespace Price_Calculator_kata
             var products=new ProductRepository();
             //Initialize  Product
             Product Book = new Product("The Little Prince", 12345, 20.25);
+            Product Chair = new Product("Wooden Chair", 789, 20.25);
             products.Add(Book);
-            
+            products.Add(Chair);
+
             //Discount Task
             var MyDiscountService = new DiscountService(products);
             var Discount = DiscountService.CreateRelativeDiscount(15.0);
+            var ChairsDiscount = DiscountService.CreateRelativeDiscount(7.0);
             MyDiscountService.ApplyDiscountForAllProducts(Discount);
-            
+            MyDiscountService.ApplyDiscount(ChairsDiscount,Chair.UPC);
+
 
         }
     }

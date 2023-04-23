@@ -38,7 +38,16 @@ namespace Price_Calculator_kata
                 product.Discounts.Add(Discount); 
             }
         }
+        public void ApplyDiscount(IDiscountCalculator discountCalculator, int upc)
+        {
+            var product = GetByUPC(upc);
+            if (product == null)
+            {
+                throw new ArgumentException("Product with the given UPC does not exist.");
+            }
 
+            product.Discounts.Add(discountCalculator);
+        }
         public void PrintPriceReport()
         {
             foreach (Product product in _products)

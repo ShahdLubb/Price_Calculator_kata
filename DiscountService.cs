@@ -23,6 +23,11 @@ namespace Price_Calculator_kata
            _productRepository.ApplyDiscountToAll(Discount);
            _productRepository.PrintPriceReport();
 
+        }
+        public void ApplyDiscount(IDiscountCalculator Discount, int upc)
+        {
+            _productRepository.ApplyDiscount(Discount,upc);
+            _productRepository.PrintPriceReport();
 
         }
     }
