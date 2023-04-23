@@ -10,6 +10,7 @@ namespace Price_Calculator_kata
     public class RelativeDiscountCalculator : IDiscountCalculator
     {
         private  double _Discount = 0.0;
+        private bool _IsBeforeTax = false;
         public  double Discount
         {
             get => _Discount;
@@ -24,6 +25,12 @@ namespace Price_Calculator_kata
         public RelativeDiscountCalculator(double discount)
         {
             Discount = discount;
+            _IsBeforeTax = false;
+        }
+        public RelativeDiscountCalculator(double discount, bool isBeforeTax)
+        {
+            Discount = discount;
+            _IsBeforeTax= isBeforeTax;
         }
         public virtual double CalculateDiscountAmount(Product product)
         {
@@ -31,10 +38,19 @@ namespace Price_Calculator_kata
             return DiscountedPrice;
             
         }
-
+        public bool isBeforeTax()
+        {
+            return _IsBeforeTax;
+        }
         public override string ToString()
         {
-            return $"Relative Discount= %{Discount} ";
+            if (isBeforeTax())
+            {
+                return $"Befor-Tax-Relative-Discount= %{Discount} ";
+            }
+            else return $"After-Tax-Relative-Discount= %{Discount} ";
         }
+
+        
     }
 }

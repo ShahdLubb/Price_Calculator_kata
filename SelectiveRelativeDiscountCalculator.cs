@@ -15,7 +15,12 @@ namespace Price_Calculator_kata
         {
             _UPC = UPC;
         }
-        
+        public SelectiveRelativeDiscountCalculator(double discount, int UPC, bool isBeforeTax)
+            : base(discount, isBeforeTax)
+        {
+            _UPC = UPC;
+        }
+
         public override double CalculateDiscountAmount(Product product)
         {
             if (product.UPC == this._UPC) return base.CalculateDiscountAmount(product);
@@ -25,7 +30,12 @@ namespace Price_Calculator_kata
 
         public override string ToString()
         {
-            return $"UPC-discount= %{Discount} for UPC={this.UPC}";
+            if (isBeforeTax())
+            {
+                return $"Befor-Tax-UPC-discount= %{Discount} for UPC={this.UPC}";
+            }
+            else return $"After-Tax-UPC-discount= %{Discount} for UPC={this.UPC}";
+
         }
     }
 }

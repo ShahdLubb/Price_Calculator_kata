@@ -30,29 +30,11 @@ namespace Price_Calculator_kata
             return _products.FirstOrDefault(p => p.UPC == upc);
         }
 
-        
-        public void ApplyDiscountToAll(IDiscountCalculator Discount)
-        {
-            foreach( Product product in _products)
-            {
-                product.Discounts.Add(Discount); 
-            }
-        }
-        public void ApplyDiscount(IDiscountCalculator discountCalculator, int upc)
-        {
-            var product = GetByUPC(upc);
-            if (product == null)
-            {
-                throw new ArgumentException("Product with the given UPC does not exist.");
-            }
-
-            product.Discounts.Add(discountCalculator);
-        }
-        public void PrintPriceReport()
+        public void PrintPriceReport(DiscountService MyDiscountService)
         {
             foreach (Product product in _products)
             {
-                Console.WriteLine(product.ReportPriceDetails());
+                Console.WriteLine(product.ReportPriceDetails(MyDiscountService));
             }
         }
 

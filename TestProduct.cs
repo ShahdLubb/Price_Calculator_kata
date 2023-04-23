@@ -21,7 +21,7 @@ namespace Price_Calculator_kata
             //Discount Task
             var MyDiscountService = new DiscountService(products);
             var Discount = DiscountService.CreateRelativeDiscount(15.0);
-            var ChairsDiscount = DiscountService.CreateSelectiveRelativeDiscount(7.0,Chair.UPC);
+            var ChairsDiscount = DiscountService.CreateSelectiveRelativeDiscount(7.0,Chair.UPC,true);
             MyDiscountService.ApplyDiscountForAllProducts(Discount);
             MyDiscountService.ApplyDiscountForAllProducts(ChairsDiscount);
 
