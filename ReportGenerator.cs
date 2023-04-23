@@ -12,6 +12,7 @@ namespace Price_Calculator_kata
         DiscountService MyDiscountService;
         CostService MycostService;
         ProductRepository products;
+        StringBuilder report;
         public ReportGenerator(DiscountService discountService, CostService costService, ProductRepository products)
         {
             this.MyDiscountService = discountService;
@@ -19,47 +20,94 @@ namespace Price_Calculator_kata
             this.products = products;
             discountService.DiscountAdded += DiscountAddedEventHandler;
         }
-        public string ReportPriceDetails(Product product)
+        public void ReportPriceDetails(Product product)
         {
-            StringBuilder report = new StringBuilder();
+            AppendProductInfo(product);
+            AppendTaxInfo(product);
+            double beforeTaxDiscountAmount = AppendBeforeTaxDiscounts(product);
+            double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
+            double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
+            double afterTaxDiscountAmount = AppendAfterTaxDiscounts(product, beforeTaxPrice);
+            AppendTaxAmount(taxAmount);
+            double totalCosts = AppendCosts(product.Price);
+            AppendDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount);
+            double totalPrice = Math.Round(beforeTaxPrice + taxAmount + totalCosts - afterTaxDiscountAmount, 2);
+            AppendTotalPrice(totalPrice);
+        }
+
+        private void AppendProductInfo(Product product)
+        {
             report.AppendLine(product.ToString());
-            if (product.TaxCalculator is null) throw new TaxNotAppliedException();
-            report.AppendLine(product.TaxCalculator.ToString());
-            double BeforTaxDiscountAmount = 0.0;
-            foreach (IDiscountCalculator Discount in MyDiscountService.GetBeforeTaxDiscounts())
+        }
+
+        private void AppendTaxInfo(Product product)
+        {
+            if (product.TaxCalculator is null)
             {
-                BeforTaxDiscountAmount += Discount.CalculateDiscountAmount(product);
-                report.AppendLine(Discount.ToString() + ",");
+                throw new TaxNotAppliedException();
             }
-            double BeforeTaxPrice = product.Price - BeforTaxDiscountAmount;
-            double TaxAmount = product.TaxCalculator.CalculateTaxAmount(BeforeTaxPrice);
-            double AfterTaxDiscountAmount = 0.0;
-            Product temp = new Product(product.Name, product.UPC, BeforeTaxPrice);
-            foreach (IDiscountCalculator Discount in MyDiscountService.GetAfterTaxDiscounts())
+            report.AppendLine(product.TaxCalculator.ToString());
+        }
+
+        private double AppendBeforeTaxDiscounts(Product product)
+        {
+            double beforeTaxDiscountAmount = 0.0;
+            foreach (IDiscountCalculator discount in MyDiscountService.GetBeforeTaxDiscounts())
             {
-                AfterTaxDiscountAmount += Discount.CalculateDiscountAmount(temp);
-                report.AppendLine(Discount.ToString() + ",");
+                beforeTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                report.AppendLine(discount.ToString() + ",");
+            }
+            return beforeTaxDiscountAmount;
+        }
+
+        private double AppendAfterTaxDiscounts(Product product, double beforeTaxPrice)
+        {
+            double afterTaxDiscountAmount = 0.0;
+            Product temp = new Product(product.Name, product.UPC, beforeTaxPrice);
+            foreach (IDiscountCalculator discount in MyDiscountService.GetAfterTaxDiscounts())
+            {
+                afterTaxDiscountAmount += discount.CalculateDiscountAmount(temp);
+                report.AppendLine(discount.ToString() + ",");
             }
             temp = null;
-            report.AppendLine($"Tax=${TaxAmount}");
-            double TotalCosts = 0;
+            return afterTaxDiscountAmount;
+        }
+
+        private void AppendTaxAmount(double taxAmount)
+        {
+            report.AppendLine($"Tax=${taxAmount}");
+        }
+
+        private double AppendCosts(double productPrice)
+        {
+            double totalCosts = 0;
             foreach (ICost cost in MycostService.GetAll())
             {
-                double costAmount= cost.GetCostAmount(product.Price);
+                double costAmount = cost.GetCostAmount(productPrice);
                 report.AppendLine($"{cost.ToString()} ===> ${costAmount}");
-                TotalCosts += Math.Round(costAmount,2);
+                totalCosts += Math.Round(costAmount, 2);
             }
-            double TotalPrice = Math.Round(product.Price + TaxAmount+ TotalCosts - AfterTaxDiscountAmount - BeforTaxDiscountAmount, 2);
-            report.AppendLine($"Discount Amount=${Math.Round(AfterTaxDiscountAmount + BeforTaxDiscountAmount, 2)}");
-            report.AppendLine($"Price=${TotalPrice}");
-            return report.ToString();
+            return totalCosts;
         }
+
+        private void AppendDiscountAmount(double discountAmount)
+        {
+            report.AppendLine($"Discount Amount=${Math.Round(discountAmount, 2)}");
+        }
+
+        private void AppendTotalPrice(double totalPrice)
+        {
+            report.AppendLine($"Price=${totalPrice}");
+        }
+
         public void ReportPriceDetailsForAllProducts()
         {
-            foreach(Product product in products.GetAll())
+            report = new StringBuilder();
+            foreach (Product product in products.GetAll())
             {
-                Console.WriteLine(ReportPriceDetails(product));
+                ReportPriceDetails(product);
             }
+            Console.WriteLine(report.ToString());
             Console.WriteLine("*******************************");
         }
         private void DiscountAddedEventHandler(object sender, EventArgs e)

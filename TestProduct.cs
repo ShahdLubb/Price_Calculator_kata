@@ -30,7 +30,6 @@ namespace Price_Calculator_kata
             MyDiscountService.ApplyDiscountForAllProducts(Discount);
             MyDiscountService.ApplyDiscountForAllProducts(BookDiscount);
 
-
         }
     }
 }
