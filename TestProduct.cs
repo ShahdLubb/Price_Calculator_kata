@@ -15,14 +15,12 @@ namespace Price_Calculator_kata
             //Initialize  Product
             Product Book = new Product("The Little Prince", 12345, 20.25);
             products.Add(Book);
-            Console.WriteLine(Book.ToString());
-
+            
             //Discount Task
             var MyDiscountService = new DiscountService(products);
             var Discount = DiscountService.CreateRelativeDiscount(15.0);
             MyDiscountService.ApplyDiscountForAllProducts(Discount);
-            Console.WriteLine($"Taxed and discount Price with Tax of %20 and discount of %15: ${Book.CalculateTotalPrice()}");
-
+            
 
         }
     }

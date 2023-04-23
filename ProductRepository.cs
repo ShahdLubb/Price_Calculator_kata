@@ -35,11 +35,19 @@ namespace Price_Calculator_kata
         {
             foreach( Product product in _products)
             {
-                product.Discounts.Add(Discount);
+                product.Discounts.Add(Discount); 
             }
         }
 
-        
+        public void PrintPriceReport()
+        {
+            foreach (Product product in _products)
+            {
+                Console.WriteLine(product.ReportPriceDetails());
+            }
+        }
+
+
 
     }
 

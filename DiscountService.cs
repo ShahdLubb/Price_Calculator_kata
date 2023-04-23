@@ -21,7 +21,9 @@ namespace Price_Calculator_kata
         public void ApplyDiscountForAllProducts(IDiscountCalculator Discount)
         {
            _productRepository.ApplyDiscountToAll(Discount);
-            
+           _productRepository.PrintPriceReport();
+
+
         }
     }
 }

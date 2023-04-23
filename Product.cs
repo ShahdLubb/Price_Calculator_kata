@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Price_Calculator_kata
 {
@@ -33,11 +34,28 @@ namespace Price_Calculator_kata
             }
             return Math.Round(Price+ TaxAmount- DiscountAmount, 2);
         }
-        
+        public string ReportPriceDetails()
+        {
+            StringBuilder report = new StringBuilder();
+            report.AppendLine(this.ToString());
+            if (TaxCalculator is null) throw new TaxNotAppliedException();
+            report.Append(TaxCalculator.ToString());
+            double TaxAmount = TaxCalculator.CalculateTaxAmount(this.Price);
+            double DiscountAmount = 0.0;
+            foreach (IDiscountCalculator Discount in Discounts)
+            {
+                DiscountAmount += Discount.CalculateDiscountAmount(this);
+                report.Append(Discount.ToString());
+            }
+            double TotalPrice = Math.Round(Price + TaxAmount - DiscountAmount, 2);
+            report.AppendLine($"Price=${TotalPrice}");
+            report.AppendLine($"Discount Amount=${Math.Round(DiscountAmount,2)}");
+            return report.ToString();
+        }
 
         public override string ToString()
         {
-            return $"Product Name:{this.Name}\nProduct UPC:{this.UPC}\nProduct Name:{this.Price}";
+            return $"- Product Name:{this.Name}   Product UPC:{this.UPC}   Product Name:{this.Price}";
         }
 
     }
