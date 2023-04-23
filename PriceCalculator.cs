@@ -10,9 +10,11 @@ namespace Price_Calculator_kata
     public class PriceCalculator
     {
         DiscountService MyDiscountService;
+        CostService MycostService;
         ProductRepository products;
-        public PriceCalculator(DiscountService discountService, ProductRepository products) {
+        public PriceCalculator(DiscountService discountService, CostService costService, ProductRepository products) {
             this.MyDiscountService = discountService;
+            this.MycostService = costService;  
             this.products= products;
          }
 
@@ -34,7 +36,13 @@ namespace Price_Calculator_kata
                 AfterTaxDiscountAmount += Discount.CalculateDiscountAmount(temp);
             }
             temp = null;
-            return Math.Round(product.Price + TaxAmount - BeforTaxDiscountAmount - AfterTaxDiscountAmount, 2);
+            double TotalCosts = 0;
+            foreach(ICost cost in MycostService.GetAll())
+            {
+                double costAmount = cost.GetCostAmount(product.Price);
+                TotalCosts += Math.Round(costAmount, 2);
+            }
+            return Math.Round(product.Price + TaxAmount - BeforTaxDiscountAmount - AfterTaxDiscountAmount+ TotalCosts, 2);
         }  
 
     }

@@ -38,7 +38,7 @@ namespace Price_Calculator_kata
         public double CalculateTaxAmount(double Price)
         {
             double taxAmount = Price * (TaxPercentageDefault / 100.0);
-            return taxAmount;
+            return Math.Round(taxAmount,2);
         }
 
         public override string ToString()

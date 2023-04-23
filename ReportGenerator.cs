@@ -10,10 +10,12 @@ namespace Price_Calculator_kata
     public  class ReportGenerator
     {
         DiscountService MyDiscountService;
+        CostService MycostService;
         ProductRepository products;
-        public ReportGenerator(DiscountService discountService,ProductRepository products)
+        public ReportGenerator(DiscountService discountService, CostService costService, ProductRepository products)
         {
             this.MyDiscountService = discountService;
+            this.MycostService = costService;
             this.products = products;
             discountService.DiscountAdded += DiscountAddedEventHandler;
         }
@@ -39,9 +41,17 @@ namespace Price_Calculator_kata
                 report.AppendLine(Discount.ToString() + ",");
             }
             temp = null;
-            double TotalPrice = Math.Round(product.Price + TaxAmount - AfterTaxDiscountAmount - BeforTaxDiscountAmount, 2);
-            report.AppendLine($"Price=${TotalPrice}");
+            report.AppendLine($"Tax=${TaxAmount}");
+            double TotalCosts = 0;
+            foreach (ICost cost in MycostService.GetAll())
+            {
+                double costAmount= cost.GetCostAmount(product.Price);
+                report.AppendLine($"{cost.ToString()} ===> ${costAmount}");
+                TotalCosts += Math.Round(costAmount,2);
+            }
+            double TotalPrice = Math.Round(product.Price + TaxAmount+ TotalCosts - AfterTaxDiscountAmount - BeforTaxDiscountAmount, 2);
             report.AppendLine($"Discount Amount=${Math.Round(AfterTaxDiscountAmount + BeforTaxDiscountAmount, 2)}");
+            report.AppendLine($"Price=${TotalPrice}");
             return report.ToString();
         }
         public void ReportPriceDetailsForAllProducts()
