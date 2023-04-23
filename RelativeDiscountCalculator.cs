@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Price_Calculator_kata
 {
-    internal class RelativeDiscountCalculator : IDiscountCalculator
+    public class RelativeDiscountCalculator : IDiscountCalculator
     {
         private  double _Discount = 0.0;
         public  double Discount
@@ -25,7 +25,7 @@ namespace Price_Calculator_kata
         {
             Discount = discount;
         }
-        public double CalculateDiscountAmount(Product product)
+        public virtual double CalculateDiscountAmount(Product product)
         {
             double DiscountedPrice =  product.Price * (_Discount / 100.0);
             return DiscountedPrice;

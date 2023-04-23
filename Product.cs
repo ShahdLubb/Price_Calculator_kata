@@ -45,10 +45,10 @@ namespace Price_Calculator_kata
             foreach (IDiscountCalculator Discount in Discounts)
             {
                 DiscountAmount += Discount.CalculateDiscountAmount(this);
-                report.Append(Discount.ToString());
+                report.Append(Discount.ToString()+ ",");
             }
             double TotalPrice = Math.Round(Price + TaxAmount - DiscountAmount, 2);
-            report.AppendLine($"Price=${TotalPrice}");
+            report.AppendLine($"\nPrice=${TotalPrice}");
             report.AppendLine($"Discount Amount=${Math.Round(DiscountAmount,2)}");
             return report.ToString();
         }

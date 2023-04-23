@@ -18,6 +18,11 @@ namespace Price_Calculator_kata
         {
             return new RelativeDiscountCalculator(discountPercentage);
         }
+
+        public static IDiscountCalculator CreateSelectiveRelativeDiscount(double discountPercentage, int UPC)
+        {
+            return new SelectiveRelativeDiscountCalculator(discountPercentage,UPC);
+        }
         public void ApplyDiscountForAllProducts(IDiscountCalculator Discount)
         {
            _productRepository.ApplyDiscountToAll(Discount);
