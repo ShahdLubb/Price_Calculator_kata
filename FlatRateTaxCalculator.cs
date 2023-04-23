@@ -41,5 +41,10 @@ namespace Price_Calculator_kata
             return taxAmount;
         }
 
+        public override string ToString()
+        {
+            return $"Flat Rate Tax= %{TaxPercentageDefault}  ";
+        }
+
     }
 }

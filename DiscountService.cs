@@ -8,25 +8,20 @@ namespace Price_Calculator_kata
 {
     public class DiscountService
     {
+        private readonly ProductRepository _productRepository;
+
+        public DiscountService(ProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
         public static IDiscountCalculator CreateRelativeDiscount(double discountPercentage)
         {
             return new RelativeDiscountCalculator(discountPercentage);
         }
-
-        
-        public static void ApplyDiscount(Product product, IDiscountCalculator discountCalculator)
+        public void ApplyDiscountForAllProducts(IDiscountCalculator Discount)
         {
-            product.Discounts.Add(discountCalculator);
-        }
-
-        public static void RemoveDiscount(Product product, IDiscountCalculator discountCalculator)
-        {
-            product.Discounts.Remove(discountCalculator);
-        }
-
-        public static void RemoveAllDiscount(Product product)
-        {
-            product.Discounts.Clear();
+           _productRepository.ApplyDiscountToAll(Discount);
+            
         }
     }
 }

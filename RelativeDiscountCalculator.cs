@@ -32,6 +32,9 @@ namespace Price_Calculator_kata
             
         }
 
-        
+        public override string ToString()
+        {
+            return $"Relative Discount= %{Discount} ";
+        }
     }
 }
