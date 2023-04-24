@@ -28,12 +28,12 @@ namespace Price_Calculator_kata
         public  double CalculateTotalPrice( Product product, DiscountCombinationMethod discountCombinationMethod)
         {
             CheckTax(product);
-            Product ProductAfterDiscounts = new Product(product.Name, product.UPC, product.Price);
+            Product ProductAfterDiscounts = new Product(product.Name, product.UPC, product.Price,product.currency);
             double beforeTaxDiscountAmount = CalculateBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
             double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
             double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
             double afterTaxDiscountAmount = CalculateAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
-            double totalCosts = CalculateCosts(product.Price);
+            double totalCosts = CalculateCosts(product);
             double DiscountAmount = CalculateDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount, product);
             double totalPrice = Math.Round(product.Price + taxAmount + totalCosts - DiscountAmount, 2);
             return totalPrice;
@@ -77,12 +77,12 @@ namespace Price_Calculator_kata
         }
 
        
-        private double CalculateCosts(double productPrice)
+        private double CalculateCosts(Product product)
         {
             double totalCosts = 0;
             foreach (ICost cost in MycostService.GetAll())
             {
-                double costAmount = cost.GetCostAmount(productPrice);
+                double costAmount = cost.GetCostAmount(product);
                 totalCosts += Math.Round(costAmount, 2);
             }
             return totalCosts;

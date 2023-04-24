@@ -8,6 +8,6 @@ namespace Price_Calculator_kata
 {
     public interface ICost
     {
-        public double GetCostAmount(double price);
+        public double GetCostAmount(Product product);
     }
 }

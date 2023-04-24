@@ -7,14 +7,15 @@ namespace Price_Calculator_kata
     {
         private double _Price;
         public ITaxCalculator? TaxCalculator;
-        
+        public Currency currency;
         public string Name { get; set; }
         public int UPC { get; set; }
-        public Product(string Name, int UPC, double Price)
+        public Product(string Name, int UPC, double Price, Currency currency)
         {
             this.Name = Name;
             this.UPC = UPC;
             this.Price = Price;
+            this.currency= currency;
             TaxServices.ApplyFlatRateTax(this);
         }
         
@@ -26,7 +27,7 @@ namespace Price_Calculator_kata
         }
         public override string ToString()
         {
-            return $"- Product Name:{this.Name}   Product UPC:{this.UPC}   Product Name:{this.Price}";
+            return $"- Product Name:{this.Name}   Product UPC:{this.UPC}   Product Price:{this.Price} {currency.ToString()}";
         }
 
     }

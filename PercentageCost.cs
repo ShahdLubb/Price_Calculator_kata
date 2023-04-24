@@ -22,9 +22,9 @@ namespace Price_Calculator_kata
             this.Percentage = percentage;
             this.Description = description;
         }
-        public double GetCostAmount(double price)
+        public double GetCostAmount(Product product)
         {
-            return Math.Round(price*(Percentage/100), 2);
+            return Math.Round(product.Price*(Percentage/100), 2);
         }
         public override string ToString()
         {

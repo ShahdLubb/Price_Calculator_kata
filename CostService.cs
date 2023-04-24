@@ -12,9 +12,9 @@ namespace Price_Calculator_kata
         public CostService() {
             _costs = new List<ICost>();
         }
-        public static ICost CreateAbsoluteValueCost(double CostValue, string Description)
+        public static ICost CreateAbsoluteValueCost(double CostValue, string Description, Currency currency)
         {
-            return new AbsoluteValueCost(CostValue, Description);
+            return new AbsoluteValueCost(CostValue, Description,currency);
         }
         public static ICost CreatePercentageCost(double percentage, string Description)
         {

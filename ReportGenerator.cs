@@ -29,23 +29,27 @@ namespace Price_Calculator_kata
         {
             AppendProductInfo(product);
             AppendTaxInfo(product);
-            Product ProductAfterDiscounts=new Product(product.Name,product.UPC,product.Price);
+            Product ProductAfterDiscounts=new Product(product.Name,product.UPC,product.Price,product.currency);
             double beforeTaxDiscountAmount = AppendBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
             double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
             double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
             double afterTaxDiscountAmount = AppendAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
-            AppendTaxAmount(taxAmount);
-            double totalCosts = AppendCosts(product.Price);
+            AppendTaxAmount(taxAmount, product);
+            double totalCosts = AppendCosts(product);
             double DiscountAmount = AppendDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount, product);
             double totalPrice = Math.Round(product.Price + taxAmount + totalCosts - DiscountAmount, 2);
-            AppendTotalPrice(totalPrice);
+            AppendTotalPrice(totalPrice,product);
+            
         }
 
         private void AppendProductInfo(Product product)
         {
             report.AppendLine(product.ToString());
         }
-
+        private void AppendProductCurrency(Product product)
+        {
+            report.Append(product.currency.ToString());
+        }
         private void AppendTaxInfo(Product product)
         {
             if (product.TaxCalculator is null)
@@ -83,18 +87,20 @@ namespace Price_Calculator_kata
             return afterTaxDiscountAmount;
         }
 
-        private void AppendTaxAmount(double taxAmount)
+        private void AppendTaxAmount(double taxAmount, Product product)
         {
-            report.AppendLine($"Tax=${taxAmount}");
+            report.Append($"Tax={taxAmount} ");
+            AppendProductCurrency(product);
+            report.AppendLine();
         }
 
-        private double AppendCosts(double productPrice)
+        private double AppendCosts(Product product)
         {
             double totalCosts = 0;
             foreach (ICost cost in MycostService.GetAll())
             {
-                double costAmount = cost.GetCostAmount(productPrice);
-                report.AppendLine($"{cost.ToString()} ===> ${costAmount}");
+                double costAmount = cost.GetCostAmount(product);
+                report.AppendLine($"{cost.ToString()} ===> {costAmount} {product.currency.ToString()}");
                 totalCosts += Math.Round(costAmount, 2);
             }
             return totalCosts;
@@ -103,20 +109,23 @@ namespace Price_Calculator_kata
         private double AppendDiscountAmount(double discountAmount,Product product)
         {
             discountAmount = AppendCap(discountAmount,product);
-            report.AppendLine($"Discount Amount=${Math.Round(discountAmount, 2)}");
+            report.AppendLine($"Discount Amount={Math.Round(discountAmount, 2)} {product.currency.ToString()}");
             return discountAmount;
         }
         private double AppendCap(double discountAmount, Product product)
         {
             if (MyCapService is null) return discountAmount;
             discountAmount = MyCapService.ApplyCap(discountAmount, product);
-            report.AppendLine($"Cap={MyCapService.ToString()}");
+
+            report.AppendLine($"Cap={MyCapService.ToStringInProductCurrency(product)}");
             return discountAmount;
         }
 
-        private void AppendTotalPrice(double totalPrice)
+        private void AppendTotalPrice(double totalPrice, Product product)
         {
-            report.AppendLine($"Price=${totalPrice}");
+            report.Append($"Price= {totalPrice} ");
+            AppendProductCurrency(product);
+            report.AppendLine();
         }
 
         public void ReportPriceDetailsForAllProducts(DiscountCombinationMethod discountCombinationMethod)
