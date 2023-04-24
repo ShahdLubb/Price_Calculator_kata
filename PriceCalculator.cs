@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Price_Calculator_kata.PriceCalculator;
 
 namespace Price_Calculator_kata
 {
@@ -17,14 +18,19 @@ namespace Price_Calculator_kata
             this.MycostService = costService;  
             this.products= products;
          }
-
-        public  double CalculateTotalPrice( Product product)
+        public enum DiscountCombinationMethod
+        {
+            Additive,
+            Multiplicative
+        }
+        public  double CalculateTotalPrice( Product product, DiscountCombinationMethod discountCombinationMethod)
         {
             CheckTax(product);
-            double beforeTaxDiscountAmount = CalculateBeforeTaxDiscounts(product);
+            Product ProductAfterDiscounts = new Product(product.Name, product.UPC, product.Price);
+            double beforeTaxDiscountAmount = CalculateBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
             double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
             double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
-            double afterTaxDiscountAmount = CalculateAfterTaxDiscounts(product, beforeTaxPrice);
+            double afterTaxDiscountAmount = CalculateAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
             double totalCosts = CalculateCosts(product.Price);
             double totalPrice = Math.Round(beforeTaxPrice + taxAmount + totalCosts - afterTaxDiscountAmount, 2);
             return totalPrice;
@@ -40,27 +46,30 @@ namespace Price_Calculator_kata
             
         }
 
-        private double CalculateBeforeTaxDiscounts(Product product)
+        private double CalculateBeforeTaxDiscounts(Product product, DiscountCombinationMethod discountCombinationMethod)
         {
             double beforeTaxDiscountAmount = 0.0;
             foreach (IDiscountCalculator discount in MyDiscountService.GetBeforeTaxDiscounts())
             {
                 beforeTaxDiscountAmount += discount.CalculateDiscountAmount(product);
-               
+                if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
+                    product.Price = product.Price - beforeTaxDiscountAmount;
             }
             return beforeTaxDiscountAmount;
         }
 
-        private double CalculateAfterTaxDiscounts(Product product, double beforeTaxPrice)
+        private double CalculateAfterTaxDiscounts(Product product, double beforeTaxPrice , DiscountCombinationMethod discountCombinationMethod)
         {
             double afterTaxDiscountAmount = 0.0;
-            Product temp = new Product(product.Name, product.UPC, beforeTaxPrice);
+            product.Price = beforeTaxPrice;
             foreach (IDiscountCalculator discount in MyDiscountService.GetAfterTaxDiscounts())
             {
-                afterTaxDiscountAmount += discount.CalculateDiscountAmount(temp);
-                
+                afterTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
+                    product.Price = product.Price - afterTaxDiscountAmount;
+
             }
-            temp = null;
+            
             return afterTaxDiscountAmount;
         }
 

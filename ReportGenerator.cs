@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Price_Calculator_kata.PriceCalculator;
 
 namespace Price_Calculator_kata
 {
@@ -18,16 +19,18 @@ namespace Price_Calculator_kata
             this.MyDiscountService = discountService;
             this.MycostService = costService;
             this.products = products;
+            report= new StringBuilder();
             discountService.DiscountAdded += DiscountAddedEventHandler;
         }
-        public void ReportPriceDetails(Product product)
+        private void ReportPriceDetails(Product product, DiscountCombinationMethod discountCombinationMethod)
         {
             AppendProductInfo(product);
             AppendTaxInfo(product);
-            double beforeTaxDiscountAmount = AppendBeforeTaxDiscounts(product);
+            Product ProductAfterDiscounts=new Product(product.Name,product.UPC,product.Price);
+            double beforeTaxDiscountAmount = AppendBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
             double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
             double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
-            double afterTaxDiscountAmount = AppendAfterTaxDiscounts(product, beforeTaxPrice);
+            double afterTaxDiscountAmount = AppendAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
             AppendTaxAmount(taxAmount);
             double totalCosts = AppendCosts(product.Price);
             AppendDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount);
@@ -49,27 +52,31 @@ namespace Price_Calculator_kata
             report.AppendLine(product.TaxCalculator.ToString());
         }
 
-        private double AppendBeforeTaxDiscounts(Product product)
+        private double AppendBeforeTaxDiscounts(Product product, DiscountCombinationMethod discountCombinationMethod)
         {
             double beforeTaxDiscountAmount = 0.0;
             foreach (IDiscountCalculator discount in MyDiscountService.GetBeforeTaxDiscounts())
             {
                 beforeTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                if(discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative)) 
+                    product.Price= product.Price -beforeTaxDiscountAmount;
                 report.AppendLine(discount.ToString() + ",");
             }
             return beforeTaxDiscountAmount;
         }
 
-        private double AppendAfterTaxDiscounts(Product product, double beforeTaxPrice)
+        private double AppendAfterTaxDiscounts(Product product, double beforeTaxPrice, DiscountCombinationMethod discountCombinationMethod)
         {
             double afterTaxDiscountAmount = 0.0;
-            Product temp = new Product(product.Name, product.UPC, beforeTaxPrice);
+            product.Price = beforeTaxPrice;
             foreach (IDiscountCalculator discount in MyDiscountService.GetAfterTaxDiscounts())
             {
-                afterTaxDiscountAmount += discount.CalculateDiscountAmount(temp);
+                afterTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
+                    product.Price = product.Price - afterTaxDiscountAmount;
                 report.AppendLine(discount.ToString() + ",");
             }
-            temp = null;
+            
             return afterTaxDiscountAmount;
         }
 
@@ -100,19 +107,23 @@ namespace Price_Calculator_kata
             report.AppendLine($"Price=${totalPrice}");
         }
 
-        public void ReportPriceDetailsForAllProducts()
+        public void ReportPriceDetailsForAllProducts(DiscountCombinationMethod discountCombinationMethod)
         {
-            report = new StringBuilder();
+            report.Clear(); 
             foreach (Product product in products.GetAll())
             {
-                ReportPriceDetails(product);
+                ReportPriceDetails(product, discountCombinationMethod);
             }
             Console.WriteLine(report.ToString());
             Console.WriteLine("*******************************");
         }
+
         private void DiscountAddedEventHandler(object sender, EventArgs e)
         {
-            ReportPriceDetailsForAllProducts();
+            Console.WriteLine("Additive:");
+            ReportPriceDetailsForAllProducts(DiscountCombinationMethod.Additive);
+            Console.WriteLine("Multiplicative:");
+            ReportPriceDetailsForAllProducts(DiscountCombinationMethod.Multiplicative);
         }
     }
 }
