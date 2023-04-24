@@ -29,14 +29,15 @@ namespace Price_Calculator_kata
         {
             CheckTax(product);
             Product ProductAfterDiscounts = new Product(product.Name, product.UPC, product.Price,product.currency);
-            double beforeTaxDiscountAmount = CalculateBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
-            double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
-            double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
-            double afterTaxDiscountAmount = CalculateAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
-            double totalCosts = CalculateCosts(product);
-            double DiscountAmount = CalculateDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount, product);
-            double totalPrice = Math.Round(product.Price + taxAmount + totalCosts - DiscountAmount, 2);
-            return totalPrice;
+            Money beforeTaxDiscountAmount = CalculateBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
+            Money beforeTaxPrice = new Money(product.Price.ValueHigherPrecision - beforeTaxDiscountAmount.ValueHigherPrecision);
+            Money taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
+            Money afterTaxDiscountAmount = CalculateAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice.ValueHigherPrecision, discountCombinationMethod);
+            Money totalCosts = CalculateCosts(product);
+            Money BeforCapDisountAmount = new Money(beforeTaxDiscountAmount.ValueHigherPrecision + afterTaxDiscountAmount.ValueHigherPrecision);
+            Money DiscountAmount = CalculateDiscountAmount(BeforCapDisountAmount, product);
+            Money totalPrice = GetTotalPrice(product.Price, taxAmount, totalCosts, DiscountAmount);
+            return totalPrice.Value;
         }
         
 
@@ -49,27 +50,29 @@ namespace Price_Calculator_kata
             
         }
 
-        private double CalculateBeforeTaxDiscounts(Product product, DiscountCombinationMethod discountCombinationMethod)
+        private Money CalculateBeforeTaxDiscounts(Product product, DiscountCombinationMethod discountCombinationMethod)
         {
-            double beforeTaxDiscountAmount = 0.0;
+            Money beforeTaxDiscountAmount = new Money(0);
             foreach (IDiscountCalculator discount in MyDiscountService.GetBeforeTaxDiscounts())
             {
-                beforeTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                double value= discount.CalculateDiscountAmount(product).ValueHigherPrecision;
+                beforeTaxDiscountAmount = new Money(beforeTaxDiscountAmount.ValueHigherPrecision +value);
                 if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
-                    product.Price = product.Price - beforeTaxDiscountAmount;
+                    product.Price.ValueHigherPrecision = product.Price.ValueHigherPrecision - beforeTaxDiscountAmount.ValueHigherPrecision;
             }
             return beforeTaxDiscountAmount;
         }
 
-        private double CalculateAfterTaxDiscounts(Product product, double beforeTaxPrice , DiscountCombinationMethod discountCombinationMethod)
+        private Money CalculateAfterTaxDiscounts(Product product, double beforeTaxPrice , DiscountCombinationMethod discountCombinationMethod)
         {
-            double afterTaxDiscountAmount = 0.0;
-            product.Price = beforeTaxPrice;
+            Money afterTaxDiscountAmount = new Money(0);
+            product.Price = new Money(beforeTaxPrice);
             foreach (IDiscountCalculator discount in MyDiscountService.GetAfterTaxDiscounts())
             {
-                afterTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                double value = discount.CalculateDiscountAmount(product).ValueHigherPrecision;
+                afterTaxDiscountAmount = new Money(afterTaxDiscountAmount.ValueHigherPrecision + value);
                 if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
-                    product.Price = product.Price - afterTaxDiscountAmount;
+                    product.Price.ValueHigherPrecision = product.Price.ValueHigherPrecision - afterTaxDiscountAmount.ValueHigherPrecision;
 
             }
             
@@ -77,19 +80,28 @@ namespace Price_Calculator_kata
         }
 
        
-        private double CalculateCosts(Product product)
+        private Money CalculateCosts(Product product)
         {
-            double totalCosts = 0;
+            Money totalCosts = new Money(0);
             foreach (ICost cost in MycostService.GetAll())
             {
-                double costAmount = cost.GetCostAmount(product);
-                totalCosts += Math.Round(costAmount, 2);
+                double costAmount = cost.GetCostAmount(product).ValueHigherPrecision;
+                totalCosts = new Money(totalCosts.ValueHigherPrecision+costAmount);
             }
             return totalCosts;
         }
-        private double CalculateDiscountAmount(double DiscountAmount, Product product)
+        private Money CalculateDiscountAmount(Money DiscountAmount, Product product)
         {
             return  MyCapService is null ? DiscountAmount: MyCapService.ApplyCap(DiscountAmount, product); 
+
+        }
+
+        private Money GetTotalPrice(Money Price,Money taxAmount,Money totalCosts,Money DiscountAmount) {
+            double value = Price.ValueHigherPrecision;
+            value += taxAmount.ValueHigherPrecision;
+            value+= totalCosts.ValueHigherPrecision;
+            value-=DiscountAmount.ValueHigherPrecision;
+            return new Money(value);
 
         }
 

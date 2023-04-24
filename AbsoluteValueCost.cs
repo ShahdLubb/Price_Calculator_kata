@@ -9,32 +9,26 @@ namespace Price_Calculator_kata
     public class AbsoluteValueCost : ICost
     {
         string Description { get; set; }
-        private double _CostValue;
         public Currency currency { get; set; }
-        public double CostValue { 
-            get=>_CostValue;
-            set { 
-                _CostValue =Math.Round(value,2);
-            } 
-        }
-        public AbsoluteValueCost(double value, string description, Currency currency)
+        public Money CostValue { get; set; }
+        public AbsoluteValueCost(Money value, string description, Currency currency)
         {
             CostValue = value;
             Description = description;
             this.currency = currency;
         }
-        public double GetCostAmount(Product product)
+        public Money GetCostAmount(Product product)
         {
-            double cost = _CostValue;
+            Money cost = new Money(CostValue.ValueHigherPrecision);
             if(!product.currency.Code.Equals(this.currency.Code)) {
                 cost = currency.ConvertToBase(cost);
                 cost= product.currency.ConvertFromBase(cost);
             }
-            return Math.Round(cost,2);
+            return cost;
         }
         public override string ToString()
         {
-            return $"{Description} =%{_CostValue}";
+            return $"{Description} =%{CostValue.ToString()}";
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Price_Calculator_kata
         }
         public static ICost CreateAbsoluteValueCost(double CostValue, string Description, Currency currency)
         {
-            return new AbsoluteValueCost(CostValue, Description,currency);
+            return new AbsoluteValueCost(new Money(CostValue), Description,currency);
         }
         public static ICost CreatePercentageCost(double percentage, string Description)
         {

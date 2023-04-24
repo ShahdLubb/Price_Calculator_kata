@@ -32,9 +32,9 @@ namespace Price_Calculator_kata
             Discount = discount;
             _IsBeforeTax= isBeforeTax;
         }
-        public virtual double CalculateDiscountAmount(Product product)
+        public virtual Money CalculateDiscountAmount(Product product)
         {
-            double DiscountedPrice =  product.Price * (_Discount / 100.0);
+            Money DiscountedPrice = new Money (product.Price.ValueHigherPrecision * (_Discount / 100.0));
             return DiscountedPrice;
             
         }

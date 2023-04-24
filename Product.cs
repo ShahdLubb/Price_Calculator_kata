@@ -5,7 +5,7 @@ namespace Price_Calculator_kata
 {
     public class Product
     {
-        private double _Price;
+        private Money _Price;
         public ITaxCalculator? TaxCalculator;
         public Currency currency;
         public string Name { get; set; }
@@ -14,20 +14,27 @@ namespace Price_Calculator_kata
         {
             this.Name = Name;
             this.UPC = UPC;
-            this.Price = Price;
+            this.Price = new Money(Price);
             this.currency= currency;
             TaxServices.ApplyFlatRateTax(this);
         }
-        
-        public double Price {
+        public Product(string Name, int UPC, Money Price, Currency currency)
+        {
+            this.Name = Name;
+            this.UPC = UPC;
+            this.Price = Price;
+            this.currency = currency;
+            TaxServices.ApplyFlatRateTax(this);
+        }
+        public Money Price {
             get => _Price;
             set {
-                if (value > 0)
-                   _Price = Math.Round(value, 2); } 
+                if (value.Value > 0)
+                   _Price = value; } 
         }
         public override string ToString()
         {
-            return $"- Product Name:{this.Name}   Product UPC:{this.UPC}   Product Price:{this.Price} {currency.ToString()}";
+            return $"- Product Name:{this.Name}   Product UPC:{this.UPC}   Product Price:{this.Price.ToString()} {currency.ToString()}";
         }
 
     }

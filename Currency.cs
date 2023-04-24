@@ -33,13 +33,13 @@ namespace Price_Calculator_kata
             Code = code;
             RateToBase = rate;
         }
-        public double ConvertToBase(double Amount)
+        public Money ConvertToBase(Money Amount)
         {
-            return Amount/ RateToBase;
+            return new Money(Amount.ValueHigherPrecision/ RateToBase);
         }
-        public double ConvertFromBase( double Amount)
+        public Money ConvertFromBase(Money Amount)
         {
-            return Amount * RateToBase;
+            return new Money(Amount.ValueHigherPrecision * RateToBase);
         }
         public static bool IsValidISO3(string code)
         {

@@ -9,7 +9,7 @@ namespace Price_Calculator_kata
 {
     public class FlatRateTaxCalculator : ITaxCalculator
     {
-        private static double _TaxPercentageDefault = 20.0;
+        private static double _TaxPercentageDefault = 20;
         public static double TaxPercentageDefault {
             get => _TaxPercentageDefault;
             set
@@ -35,10 +35,10 @@ namespace Price_Calculator_kata
         }
 
 
-        public double CalculateTaxAmount(double Price)
+        public Money CalculateTaxAmount(Money Price)
         {
-            double taxAmount = Price * (TaxPercentageDefault / 100.0);
-            return Math.Round(taxAmount,2);
+            Money taxAmount =new Money( Price.ValueHigherPrecision * (TaxPercentageDefault/ 100.0));
+            return taxAmount;
         }
 
         public override string ToString()

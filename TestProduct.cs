@@ -16,28 +16,28 @@ namespace Price_Calculator_kata
             //Product Repositry
             var products=new ProductRepository();
             //Initialize  Product
-            Product Book = new Product("The Little Prince", 12345, 20.25, euro);
+            Product Book = new Product("The Little Prince", 12345, 20.25, dollar);
             //Product Chair = new Product("Wooden Chair", 789, 20.25);
             products.Add(Book);
             //products.Add(Chair);
             FlatRateTaxCalculator.TaxPercentageDefault = 21;
 
             CostService MyCostService = new CostService();
-            var transCost = CostService.CreateAbsoluteValueCost(2.2,"Transport Cost", euro);
-            var packagingCost = CostService.CreatePercentageCost(1, "Packaging Cost");
+            var transCost = CostService.CreatePercentageCost(3,"Transport Cost");
+            //var packagingCost = CostService.CreatePercentageCost(1, "Packaging Cost");
             MyCostService.AddCost(transCost);
-            MyCostService.AddCost(packagingCost);
+            //MyCostService.AddCost(packagingCost);
 
             DiscountService MyDiscountService = new DiscountService();
             var Discount = DiscountService.CreateRelativeDiscount(15.0);
             var BookDiscount = DiscountService.CreateSelectiveRelativeDiscount(7.0,Book.UPC);
 
-            CapService MycapService = new CapService(4,false,euro);
+            CapService MycapService = new CapService(20.25,false,dollar);
             ReportGenerator Report = new(MyDiscountService, MyCostService, MycapService, products);
-            PriceCalculator calc=new PriceCalculator(MyDiscountService, MyCostService, MycapService, products);
+            //PriceCalculator calc=new PriceCalculator(MyDiscountService, MyCostService, MycapService, products);
             MyDiscountService.ApplyDiscountForAllProducts(Discount);
             MyDiscountService.ApplyDiscountForAllProducts(BookDiscount);
-            Console.WriteLine(calc.CalculateTotalPrice(Book, DiscountCombinationMethod.Additive));
+            //Console.WriteLine(calc.CalculateTotalPrice(Book, DiscountCombinationMethod.Additive));
             
 
         }

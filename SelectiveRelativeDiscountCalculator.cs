@@ -21,10 +21,10 @@ namespace Price_Calculator_kata
             _UPC = UPC;
         }
 
-        public override double CalculateDiscountAmount(Product product)
+        public override Money CalculateDiscountAmount(Product product)
         {
             if (product.UPC == this._UPC) return base.CalculateDiscountAmount(product);
-            else return 0;
+            else return new Money(0);
 
         }
 

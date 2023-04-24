@@ -30,15 +30,16 @@ namespace Price_Calculator_kata
             AppendProductInfo(product);
             AppendTaxInfo(product);
             Product ProductAfterDiscounts=new Product(product.Name,product.UPC,product.Price,product.currency);
-            double beforeTaxDiscountAmount = AppendBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
-            double beforeTaxPrice = product.Price - beforeTaxDiscountAmount;
-            double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
-            double afterTaxDiscountAmount = AppendAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
+            Money beforeTaxDiscountAmount = AppendBeforeTaxDiscounts(ProductAfterDiscounts, discountCombinationMethod);
+            Money beforeTaxPrice = new Money(product.Price.ValueHigherPrecision - beforeTaxDiscountAmount.ValueHigherPrecision);
+            Money taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
+            Money afterTaxDiscountAmount = AppendAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice.ValueHigherPrecision, discountCombinationMethod);
             AppendTaxAmount(taxAmount, product);
-            double totalCosts = AppendCosts(product);
-            double DiscountAmount = AppendDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount, product);
-            double totalPrice = Math.Round(product.Price + taxAmount + totalCosts - DiscountAmount, 2);
-            AppendTotalPrice(totalPrice,product);
+            Money totalCosts = AppendCosts(product);
+            Money BeforCapDisountAmount = new Money(beforeTaxDiscountAmount.ValueHigherPrecision + afterTaxDiscountAmount.ValueHigherPrecision);
+            Money DiscountAmount = AppendDiscountAmount(BeforCapDisountAmount, product);
+            Money totalPrice = GetTotalPrice(product.Price, taxAmount, totalCosts, DiscountAmount);
+            AppendTotalPrice(totalPrice.Value,product);
             
         }
 
@@ -59,60 +60,63 @@ namespace Price_Calculator_kata
             report.AppendLine(product.TaxCalculator.ToString());
         }
 
-        private double AppendBeforeTaxDiscounts(Product product, DiscountCombinationMethod discountCombinationMethod)
+        private Money AppendBeforeTaxDiscounts(Product product, DiscountCombinationMethod discountCombinationMethod)
         {
-            double beforeTaxDiscountAmount = 0.0;
-            foreach (IDiscountCalculator discount in MyDiscountService.GetBeforeTaxDiscounts())
-            {
-                beforeTaxDiscountAmount += discount.CalculateDiscountAmount(product);
-                if(discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative)) 
-                    product.Price= product.Price -beforeTaxDiscountAmount;
-                report.AppendLine(discount.ToString() + ",");
-            }
-            return beforeTaxDiscountAmount;
+           Money beforeTaxDiscountAmount = new Money(0);
+           foreach (IDiscountCalculator discount in MyDiscountService.GetBeforeTaxDiscounts())
+                {
+                    double value = discount.CalculateDiscountAmount(product).ValueHigherPrecision;
+                    beforeTaxDiscountAmount = new Money(beforeTaxDiscountAmount.ValueHigherPrecision + value);
+                    if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
+                        product.Price.ValueHigherPrecision = product.Price.ValueHigherPrecision - beforeTaxDiscountAmount.ValueHigherPrecision;
+                    report.AppendLine(discount.ToString() + ",");
+                }
+           return beforeTaxDiscountAmount;
         }
 
-        private double AppendAfterTaxDiscounts(Product product, double beforeTaxPrice, DiscountCombinationMethod discountCombinationMethod)
+        private Money AppendAfterTaxDiscounts(Product product, double beforeTaxPrice, DiscountCombinationMethod discountCombinationMethod)
         {
-            double afterTaxDiscountAmount = 0.0;
-            product.Price = beforeTaxPrice;
+            Money afterTaxDiscountAmount = new Money(0);
+            product.Price = new Money(beforeTaxPrice);
             foreach (IDiscountCalculator discount in MyDiscountService.GetAfterTaxDiscounts())
             {
-                afterTaxDiscountAmount += discount.CalculateDiscountAmount(product);
+                double value = discount.CalculateDiscountAmount(product).ValueHigherPrecision;
+                afterTaxDiscountAmount = new Money(afterTaxDiscountAmount.ValueHigherPrecision + value);
                 if (discountCombinationMethod.Equals(DiscountCombinationMethod.Multiplicative))
-                    product.Price = product.Price - afterTaxDiscountAmount;
+                    product.Price.ValueHigherPrecision = product.Price.ValueHigherPrecision - afterTaxDiscountAmount.ValueHigherPrecision;
                 report.AppendLine(discount.ToString() + ",");
             }
-            
+
             return afterTaxDiscountAmount;
         }
 
-        private void AppendTaxAmount(double taxAmount, Product product)
+        private void AppendTaxAmount(Money taxAmount, Product product)
         {
-            report.Append($"Tax={taxAmount} ");
+            report.Append($"Tax={taxAmount.ToString()} ");
             AppendProductCurrency(product);
             report.AppendLine();
         }
 
-        private double AppendCosts(Product product)
+        private Money AppendCosts(Product product)
         {
-            double totalCosts = 0;
+            Money totalCosts = new Money(0);
             foreach (ICost cost in MycostService.GetAll())
             {
-                double costAmount = cost.GetCostAmount(product);
-                report.AppendLine($"{cost.ToString()} ===> {costAmount} {product.currency.ToString()}");
-                totalCosts += Math.Round(costAmount, 2);
+                Money costAmount = cost.GetCostAmount(product);
+                report.AppendLine($"{cost.ToString()} ===> {costAmount.ToString()} {product.currency.ToString()}");
+                totalCosts = new Money(totalCosts.ValueHigherPrecision + costAmount.ValueHigherPrecision);
             }
             return totalCosts;
+           
         }
 
-        private double AppendDiscountAmount(double discountAmount,Product product)
+        private Money AppendDiscountAmount(Money discountAmount,Product product)
         {
             discountAmount = AppendCap(discountAmount,product);
-            report.AppendLine($"Discount Amount={Math.Round(discountAmount, 2)} {product.currency.ToString()}");
+            report.AppendLine($"Discount Amount={discountAmount.ToString()} {product.currency.ToString()}");
             return discountAmount;
         }
-        private double AppendCap(double discountAmount, Product product)
+        private Money AppendCap(Money discountAmount, Product product)
         {
             if (MyCapService is null) return discountAmount;
             discountAmount = MyCapService.ApplyCap(discountAmount, product);
@@ -126,6 +130,15 @@ namespace Price_Calculator_kata
             report.Append($"Price= {totalPrice} ");
             AppendProductCurrency(product);
             report.AppendLine();
+        }
+        private Money GetTotalPrice(Money Price, Money taxAmount, Money totalCosts, Money DiscountAmount)
+        {
+            double value = Price.ValueHigherPrecision;
+            value += taxAmount.ValueHigherPrecision;
+            value += totalCosts.ValueHigherPrecision;
+            value -= DiscountAmount.ValueHigherPrecision;
+            return new Money(value);
+
         }
 
         public void ReportPriceDetailsForAllProducts(DiscountCombinationMethod discountCombinationMethod)

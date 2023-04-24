@@ -9,6 +9,6 @@ namespace Price_Calculator_kata
     public interface IDiscountCalculator
     {
         public bool isBeforeTax();
-        public double CalculateDiscountAmount(Product product);
+        public Money CalculateDiscountAmount(Product product);
     }
 }

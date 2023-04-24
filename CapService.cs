@@ -8,20 +8,20 @@ namespace Price_Calculator_kata
 {
     public class CapService
     {
-        public double Amount { get; }
+        public Money Amount { get; }
         private bool isPercentage;
         public Currency currency;
         public CapService(double amount, bool isPercentage, Currency currency)
         {
-            Amount = amount;
+            Amount = new Money(amount);
             this.isPercentage = isPercentage;
             this.currency = currency;
         }
 
-        public double ApplyCap(double DiscountAmount,Product product)
+        public Money ApplyCap(Money DiscountAmount,Product product)
         {
-            double capVal = 0;
-            if (isPercentage) capVal = product.Price * (Amount / 100);
+            Money capVal ;
+            if (isPercentage) capVal = new Money(product.Price.ValueHigherPrecision * (Amount.ValueHigherPrecision / 100));
             else { 
                 capVal = Amount;
                 if (!product.currency.Code.Equals(this.currency.Code))
@@ -31,7 +31,7 @@ namespace Price_Calculator_kata
                 }
             }
 
-            if (DiscountAmount > capVal) return capVal;
+            if (DiscountAmount.ValueHigherPrecision > capVal.ValueHigherPrecision) return capVal;
             else return DiscountAmount;
 
            
@@ -41,24 +41,24 @@ namespace Price_Calculator_kata
         public override string ToString()
         {
             if (isPercentage)
-                return $"%{Amount} of price";
+                return $"%{Amount.ToString()} of price";
             else
-                return $"{Amount} {currency.ToString()}";
+                return $"{Amount.ToString()} {currency.ToString()}";
 
         }
         public  string ToStringInProductCurrency(Product product)
         {
             if (isPercentage)
-                return $"%{Amount} of price";
+                return $"%{Amount.ToString()} of price";
             else
             {
-                double capVal = Amount;
+                Money capVal = Amount;
                 if (!product.currency.Code.Equals(this.currency.Code))
                 {
                     capVal = currency.ConvertToBase(capVal);
                     capVal = product.currency.ConvertFromBase(capVal);
                 }
-                return $"{capVal} {product.currency.ToString()}";
+                return $"{capVal.ToString()} {product.currency.ToString()}";
             }
                 
 
