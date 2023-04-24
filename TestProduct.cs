@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Price_Calculator_kata.PriceCalculator;
 
 namespace Price_Calculator_kata
 {
@@ -18,17 +19,23 @@ namespace Price_Calculator_kata
             products.Add(Book);
             //products.Add(Chair);
             FlatRateTaxCalculator.TaxPercentageDefault = 21;
+
             CostService MyCostService = new CostService();
-            var transCost = CostService.CreateAbsoluteValueCost(2.2,"Transport Cost");
-            var packagingCost = CostService.CreatePercentageCost(1, "Packaging Cost");
-            MyCostService.AddCost(transCost);
-            MyCostService.AddCost(packagingCost);
+            //var transCost = CostService.CreateAbsoluteValueCost(2.2,"Transport Cost");
+            //var packagingCost = CostService.CreatePercentageCost(1, "Packaging Cost");
+            //MyCostService.AddCost(transCost);
+            //MyCostService.AddCost(packagingCost);
+
             DiscountService MyDiscountService = new DiscountService();
             var Discount = DiscountService.CreateRelativeDiscount(15.0);
             var BookDiscount = DiscountService.CreateSelectiveRelativeDiscount(7.0,Book.UPC);
-            ReportGenerator Report = new(MyDiscountService, MyCostService, products);
+
+            CapService MycapService = new CapService(4,false);
+            ReportGenerator Report = new(MyDiscountService, MyCostService, MycapService,products);
+            //PriceCalculator calc=new PriceCalculator(MyDiscountService, MyCostService, MycapService, products);
             MyDiscountService.ApplyDiscountForAllProducts(Discount);
             MyDiscountService.ApplyDiscountForAllProducts(BookDiscount);
+            
 
         }
     }

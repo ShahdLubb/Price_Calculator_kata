@@ -10,13 +10,15 @@ namespace Price_Calculator_kata
 {
     public class PriceCalculator
     {
-        DiscountService MyDiscountService;
-        CostService MycostService;
-        ProductRepository products;
-        public PriceCalculator(DiscountService discountService, CostService costService, ProductRepository products) {
+        public DiscountService MyDiscountService { get; }
+        public CostService MycostService { get; }
+        public ProductRepository products { get; }
+        public CapService MyCapService { get; }
+        public PriceCalculator(DiscountService discountService, CostService costService,CapService MyCapService, ProductRepository products) {
             this.MyDiscountService = discountService;
             this.MycostService = costService;  
             this.products= products;
+            this.MyCapService = MyCapService;
          }
         public enum DiscountCombinationMethod
         {
@@ -32,7 +34,8 @@ namespace Price_Calculator_kata
             double taxAmount = product.TaxCalculator.CalculateTaxAmount(beforeTaxPrice);
             double afterTaxDiscountAmount = CalculateAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
             double totalCosts = CalculateCosts(product.Price);
-            double totalPrice = Math.Round(beforeTaxPrice + taxAmount + totalCosts - afterTaxDiscountAmount, 2);
+            double DiscountAmount = CalculateDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount, product);
+            double totalPrice = Math.Round(product.Price + taxAmount + totalCosts - DiscountAmount, 2);
             return totalPrice;
         }
         
@@ -83,6 +86,11 @@ namespace Price_Calculator_kata
                 totalCosts += Math.Round(costAmount, 2);
             }
             return totalCosts;
+        }
+        private double CalculateDiscountAmount(double DiscountAmount, Product product)
+        {
+            return  MyCapService is null ? DiscountAmount: MyCapService.ApplyCap(DiscountAmount, product); 
+
         }
 
     }

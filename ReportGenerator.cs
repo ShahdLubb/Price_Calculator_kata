@@ -10,17 +10,20 @@ namespace Price_Calculator_kata
 {
     public  class ReportGenerator
     {
-        DiscountService MyDiscountService;
-        CostService MycostService;
-        ProductRepository products;
-        StringBuilder report;
-        public ReportGenerator(DiscountService discountService, CostService costService, ProductRepository products)
+        public DiscountService MyDiscountService { get; }
+        public CostService MycostService { get; }
+        public ProductRepository products { get; }
+        public CapService MyCapService { get; }
+        private StringBuilder report;
+        public ReportGenerator(DiscountService discountService, CostService costService, CapService myCapService, ProductRepository products)
         {
+            report=new StringBuilder();
             this.MyDiscountService = discountService;
             this.MycostService = costService;
             this.products = products;
-            report= new StringBuilder();
+            MyCapService = myCapService;
             discountService.DiscountAdded += DiscountAddedEventHandler;
+
         }
         private void ReportPriceDetails(Product product, DiscountCombinationMethod discountCombinationMethod)
         {
@@ -33,8 +36,8 @@ namespace Price_Calculator_kata
             double afterTaxDiscountAmount = AppendAfterTaxDiscounts(ProductAfterDiscounts, beforeTaxPrice, discountCombinationMethod);
             AppendTaxAmount(taxAmount);
             double totalCosts = AppendCosts(product.Price);
-            AppendDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount);
-            double totalPrice = Math.Round(beforeTaxPrice + taxAmount + totalCosts - afterTaxDiscountAmount, 2);
+            double DiscountAmount = AppendDiscountAmount(beforeTaxDiscountAmount + afterTaxDiscountAmount, product);
+            double totalPrice = Math.Round(product.Price + taxAmount + totalCosts - DiscountAmount, 2);
             AppendTotalPrice(totalPrice);
         }
 
@@ -97,9 +100,18 @@ namespace Price_Calculator_kata
             return totalCosts;
         }
 
-        private void AppendDiscountAmount(double discountAmount)
+        private double AppendDiscountAmount(double discountAmount,Product product)
         {
+            discountAmount = AppendCap(discountAmount,product);
             report.AppendLine($"Discount Amount=${Math.Round(discountAmount, 2)}");
+            return discountAmount;
+        }
+        private double AppendCap(double discountAmount, Product product)
+        {
+            if (MyCapService is null) return discountAmount;
+            discountAmount = MyCapService.ApplyCap(discountAmount, product);
+            report.AppendLine($"Cap={MyCapService.ToString()}");
+            return discountAmount;
         }
 
         private void AppendTotalPrice(double totalPrice)
