@@ -9,17 +9,11 @@ namespace Price_Calculator_kata
     public class TaxServices
     {
         
-        private static ITaxCalculator getFlatRateTaxCalculator()
+        public  ITaxCalculator getFlatRateTaxCalculator()
         {
-            return  FlatRateTaxCalculator.Instance;
+            return  new FlatRateTaxCalculator();
         }
-        public static void ApplyFlatRateTax(Product product)
-        {
-            product.TaxCalculator = getFlatRateTaxCalculator();
-        }
-        public static void ApplyTax(Product product, ITaxCalculator TaxCalculator)
-        {
-            product.TaxCalculator = TaxCalculator;
-        }
+       
+        
     }
 }
