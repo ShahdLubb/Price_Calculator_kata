@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Price_Calculator_kata
+﻿namespace Price_Calculator_kata
 {
     public class PriceCalculator
     {
         TaxServices MyTaxService;
-        public PriceCalculator(TaxServices MyTaxService) {
-           
+        DiscountService MyDiscountService;
+        public PriceCalculator(TaxServices MyTaxService, DiscountService MyDiscountService)
+        {
             this.MyTaxService = MyTaxService;
-        
-         }
-       
+            this.MyDiscountService = MyDiscountService;
+
+        }
+
         public double CalculateTotalPrice(Product product)
         {
             double taxAmount = CalculateTaxAmount(product);
-            double totalPrice = Math.Round(product.Price + taxAmount, 2);
+            double DiscountAmount = CalculateDiscountAmount(product);
+            double totalPrice = Math.Round(product.Price + taxAmount - DiscountAmount, 2);
             return totalPrice;
         }
         private void CheckTax()
@@ -33,9 +29,18 @@ namespace Price_Calculator_kata
 
         public double CalculateTaxAmount(Product product)
         {
-            ITaxCalculator TaxCalculator= MyTaxService.getFlatRateTaxCalculator();
+            ITaxCalculator TaxCalculator = MyTaxService.getFlatRateTaxCalculator();
             double TaxAmount = TaxCalculator.CalculateTaxAmount(product.Price);
             return TaxAmount;
+        }
+        private double CalculateDiscountAmount(Product product)
+        {
+            double DiscountAmount = 0;
+            foreach (IDiscountCalculator discount in MyDiscountService.GetDiscounts())
+            {
+                DiscountAmount += discount.CalculateDiscountAmount(product);
+            }
+            return DiscountAmount;
         }
 
 

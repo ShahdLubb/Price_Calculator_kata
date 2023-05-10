@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Price_Calculator_kata
+﻿namespace Price_Calculator_kata
 {
     internal class RelativeDiscountCalculator : IDiscountCalculator
     {
@@ -27,9 +20,9 @@ namespace Price_Calculator_kata
         }
         public double CalculateDiscountAmount(Product product)
         {
-            double DiscountedPrice =  product.Price * (_Discount / 100.0);
+            double DiscountedPrice = product.Price * (_Discount / 100.0);
             return DiscountedPrice;
-            
+
         }
 
         public override string ToString()

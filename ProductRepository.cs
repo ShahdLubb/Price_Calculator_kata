@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Price_Calculator_kata
+﻿namespace Price_Calculator_kata
 {
-    public class ProductRepository 
+    public class ProductRepository
     {
         private List<Product> _products;
 
@@ -30,16 +24,12 @@ namespace Price_Calculator_kata
             return _products.FirstOrDefault(p => p.UPC == upc);
         }
 
-        
-        public void ApplyDiscountToAll(IDiscountCalculator Discount)
+        public List<Product> GetAll()
         {
-            foreach( Product product in _products)
-            {
-                product.Discounts.Add(Discount);
-            }
+            return _products;
         }
 
-        
+
 
     }
 

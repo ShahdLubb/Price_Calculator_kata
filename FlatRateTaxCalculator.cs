@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Price_Calculator_kata
+﻿namespace Price_Calculator_kata
 {
     public class FlatRateTaxCalculator : ITaxCalculator
     {
-      
+
         public double CalculateTaxAmount(double Price)
         {
             double TaxPercentageDefault = PriceCalculatorConfigurations.FlatRateTax;
@@ -20,6 +12,7 @@ namespace Price_Calculator_kata
 
         public override string ToString()
         {
+            double TaxPercentageDefault = PriceCalculatorConfigurations.FlatRateTax;
             return $"Flat Rate Tax= %{TaxPercentageDefault}  ";
         }
 
