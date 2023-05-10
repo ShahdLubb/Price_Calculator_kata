@@ -1,2 +1,2 @@
 # Price_Calculator_kata
-this project represents a price calculator, the purpose is to train on the basics of C#
+this project represents a price calculator, the purpose is to practice the basics of C#

@@ -12,8 +12,8 @@ namespace Price_Calculator_kata
         public static string DefaultMessage = "Tax is mandotery, apply a Tax before trying to calculate the total price";
         public TaxNotAppliedException()
             : base(DefaultMessage) { }
-    
-        public TaxNotAppliedException(string message) 
+
+        public TaxNotAppliedException(string message)
               : base(message) { }
         public TaxNotAppliedException(string message, Exception inner)
               : base(message, inner) { }
