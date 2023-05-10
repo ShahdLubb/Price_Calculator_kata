@@ -4,30 +4,27 @@ namespace Price_Calculator_kata
 {
     public class Product
     {
-        public static double TaxPercentageDefault = 20.0;
+        private double _Price;
         public string Name { get; set; }
         public int UPC { get; set; }
-        private double _Price;
-        public Product(string Name, int UPC, double Price) {
+        public Product(string Name, int UPC, double Price)
+        {
             this.Name = Name;
             this.UPC = UPC;
             this.Price = Price;
         }
         
         public double Price {
-            get => _Price; 
-            set => _Price = Math.Round(value,2); 
+            get => _Price;
+            set {
+                if (value > 0)
+                   _Price = Math.Round(value, 2); } 
         }
+
         
-        public double CalculateTax()
+        public override string ToString()
         {
-            double taxedPrice= Price * (1.0 + TaxPercentageDefault / 100.0);
-            return Math.Round(taxedPrice,2);
-        }
-        public double CalculateTax(double TaxPercentage)
-        {
-            double taxedPrice = Price * (1.0 + TaxPercentage / 100.0);
-            return Math.Round(taxedPrice, 2);
+            return $"Product Name:{this.Name}\nProduct UPC:{this.UPC}\nProduct Name:{this.Price}";
         }
 
     }
