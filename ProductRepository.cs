@@ -1,0 +1,36 @@
+﻿namespace Price_Calculator_kata
+{
+    public class ProductRepository
+    {
+        private List<Product> _products;
+
+        public ProductRepository()
+        {
+            _products = new List<Product>();
+        }
+
+        public void Add(Product product)
+        {
+            _products.Add(product);
+        }
+
+        public void Remove(Product product)
+        {
+            _products.Remove(product);
+        }
+
+        public Product GetByUPC(int upc)
+        {
+            return _products.FirstOrDefault(p => p.UPC == upc);
+        }
+
+        public List<Product> GetAll()
+        {
+            return _products;
+        }
+
+
+
+    }
+
+}

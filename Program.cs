@@ -1,22 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Price_Calculator_kata
+﻿namespace Price_Calculator_kata
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            TaxServices MyTaxService= new TaxServices();
-            PriceCalculator MyPriceCalculator = new PriceCalculator(MyTaxService);
+
+            var products = new ProductRepository();
+
+            var MyDiscountService = new DiscountService();
+
+            TaxServices MyTaxService = new TaxServices();
+            PriceCalculator MyPriceCalculator = new PriceCalculator(MyTaxService, MyDiscountService);
+
             Product Book = new Product("The Little Prince", 12345, 20.25);
+            products.Add(Book);
             Console.WriteLine(Book.ToString());
+
+            //create a Discount 
+            var Discount = DiscountService.CreateRelativeDiscount(15.0);
+            MyDiscountService.ApplyDiscountForAllProducts(Discount);
+
             Console.WriteLine($"Taxed Price with default Tax of 20% :{MyPriceCalculator.CalculateTotalPrice(Book)}");
-            PriceCalculatorConfigurations.FlatRateTax = 21;
-            Console.WriteLine($"Taxed Price with Tax of 21% :{MyPriceCalculator.CalculateTotalPrice(Book)}");
 
         }
     }

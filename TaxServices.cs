@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Price_Calculator_kata
+﻿namespace Price_Calculator_kata
 {
-    public class TaxServices
+    public class TaxServices : ITaxServices
     {
-        
-        public  ITaxCalculator getFlatRateTaxCalculator()
+        public ITaxCalculator getFlatRateTaxCalculator()
         {
-            return  new FlatRateTaxCalculator();
+            return new FlatRateTaxCalculator();
         }
-       
-        
+
+
     }
 }
