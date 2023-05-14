@@ -1,4 +1,6 @@
-﻿namespace Price_Calculator_kata
+﻿using Price_Calculator_kata.Price_Calculator_kata;
+
+namespace Price_Calculator_kata
 {
     internal class RelativeDiscountCalculator : IDiscountCalculator
     {
@@ -11,6 +13,10 @@
                 if (value >= 0 && value < 100.0)
                 {
                     _Discount = Math.Round(value, 2);
+                }
+                else
+                {
+                    throw new InvalidDiscountException();
                 }
             }
         }

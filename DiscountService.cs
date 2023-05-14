@@ -1,6 +1,6 @@
 ﻿namespace Price_Calculator_kata
 {
-    public class DiscountService
+    public class DiscountService : IDiscountService
     {
         private List<IDiscountCalculator> Discounts = new List<IDiscountCalculator>();
 

@@ -1,6 +1,6 @@
 ﻿namespace Price_Calculator_kata
 {
-    public class TaxServices
+    public class TaxServices : ITaxServices
     {
         public ITaxCalculator getFlatRateTaxCalculator()
         {
